@@ -1,0 +1,56 @@
+<div class="grid">
+  <main>
+    <div class="card">
+      <h2>Dados do checklist</h2>
+      <div class="form-grid">
+        <div><label>Responsável</label><input id="responsible" placeholder="Nome da colaboradora" /></div>
+        <div><label>Data</label><input id="date" type="date" /></div>
+        <div><label>Turno</label><select id="shift"><option>Integral</option><option>Manhã</option><option>Tarde</option></select></div>
+        <div><label>Assinatura digital</label><input id="signature" placeholder="Nome para validar" /></div>
+      </div>
+      <div class="actions">
+        <button class="btn" onclick="saveCurrent()">Salvar</button>
+        <button class="btn-green" onclick="finalizeChecklist()">Finalizar e gerar relatório</button>
+        <button class="btn-light" onclick="loadDate(document.getElementById('date').value)">Carregar data</button>
+        <button class="btn-red" onclick="clearCurrent()">Limpar atual</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Filtros e rotina ativa</h2>
+      <div class="form-grid" style="grid-template-columns: 1fr 220px;">
+        <div><label>Buscar tarefa</label><input id="search" placeholder="Buscar tarefa" oninput="render()" /></div>
+        <div><label>Status</label><select id="filter" onchange="render()"><option value="todos">Todas</option><option value="concluidas">Somente concluídas</option><option value="pendentes">Somente pendentes</option></select></div>
+      </div>
+      <div class="info-line" style="margin-top:12px;"><span>Rotinas liberadas</span><strong id="activeGroups">-</strong></div>
+    </div>
+
+    <div id="sections"></div>
+  </main>
+
+  <aside>
+    <div class="card">
+      <h2>Painel do dia</h2>
+      <div id="dailyPanel"></div>
+    </div>
+
+    <div class="card">
+      <h2>Resumo gerencial</h2>
+      <div id="summaryPanel"></div>
+      <div style="display:flex; gap:8px; margin-top:12px;">
+        <button class="btn" onclick="openReport()" style="flex:1">Ver relatório</button>
+        <button class="btn-light" onclick="downloadReport()">Baixar</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Observações gerais</h2>
+      <textarea id="generalNotes" placeholder="Ex.: falta de material, área em manutenção..."></textarea>
+    </div>
+
+    <div class="card">
+      <h2>Histórico salvo</h2>
+      <div id="history"></div>
+    </div>
+  </aside>
+</div>

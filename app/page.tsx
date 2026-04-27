@@ -1,3 +1,12 @@
 export default function Page() {
-  return <h1>Checklist funcionando 🚀</h1>;
+  return (
+    <iframe
+      src="/checklist.html"
+      style={{
+        width: "100%",
+        height: "100vh",
+        border: "none",
+      }}
+    />
+  );
 }

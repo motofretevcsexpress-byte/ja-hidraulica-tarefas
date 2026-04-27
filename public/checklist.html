@@ -1,56 +1,364 @@
-<div class="grid">
-  <main>
-    <div class="card">
-      <h2>Dados do checklist</h2>
-      <div class="form-grid">
-        <div><label>Responsável</label><input id="responsible" placeholder="Nome da colaboradora" /></div>
-        <div><label>Data</label><input id="date" type="date" /></div>
-        <div><label>Turno</label><select id="shift"><option>Integral</option><option>Manhã</option><option>Tarde</option></select></div>
-        <div><label>Assinatura digital</label><input id="signature" placeholder="Nome para validar" /></div>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Checklist de Limpeza</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f1f5f9;
+      color: #0f172a;
+    }
+    .wrap {
+      max-width: 1180px;
+      margin: auto;
+      padding: 18px;
+    }
+    .hero {
+      background: linear-gradient(135deg, #0f172a, #0b4f8a, #0891b2);
+      color: white;
+      border-radius: 28px;
+      padding: 26px;
+      box-shadow: 0 18px 40px rgba(15, 23, 42, .18);
+    }
+    .hero-top {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .logo {
+      height: 62px;
+      background: white;
+      border-radius: 14px;
+      padding: 8px;
+    }
+    h1 { margin: 0; font-size: 36px; }
+    .sub { margin-top: 10px; opacity: .85; line-height: 1.5; }
+    .chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+    .chip {
+      background: rgba(255,255,255,.14);
+      border: 1px solid rgba(255,255,255,.18);
+      padding: 9px 12px;
+      border-radius: 999px;
+      font-size: 14px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1.55fr .85fr;
+      gap: 18px;
+      margin-top: 18px;
+    }
+    .card {
+      background: white;
+      border-radius: 24px;
+      padding: 18px;
+      box-shadow: 0 4px 18px rgba(15, 23, 42, .06);
+      border: 1px solid #e2e8f0;
+      margin-bottom: 18px;
+    }
+    .card h2 { margin: 0 0 14px; font-size: 19px; }
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    label { display: block; font-size: 13px; color: #475569; margin-bottom: 6px; font-weight: 700; }
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid #cbd5e1;
+      border-radius: 14px;
+      padding: 12px;
+      font-size: 14px;
+      outline: none;
+      background: white;
+    }
+    textarea { min-height: 140px; resize: vertical; }
+    input:focus, select:focus, textarea:focus { border-color: #2563eb; box-shadow: 0 0 0 4px rgba(37,99,235,.08); }
+    .actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 14px; }
+    button {
+      border: 0;
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: .2s;
+    }
+    .btn { background: #0f172a; color: white; }
+    .btn:hover { background: #1e293b; }
+    .btn-light { background: white; border: 1px solid #cbd5e1; color: #0f172a; }
+    .btn-blue { background: #2563eb; color: white; }
+    .btn-green { background: #16a34a; color: white; }
+    .btn-red { background: #dc2626; color: white; }
+    .section {
+      background: white;
+      border-radius: 24px;
+      overflow: hidden;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 18px rgba(15, 23, 42, .06);
+      margin-bottom: 18px;
+    }
+    .section-head {
+      padding: 16px 18px;
+      color: white;
+      background: linear-gradient(90deg, #0284c7, #2563eb, #06b6d4);
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+    }
+    .section-head h3 { margin: 0; }
+    .section-count { background: rgba(255,255,255,.16); border-radius: 999px; padding: 7px 10px; font-size: 12px; font-weight: 800; }
+    .task {
+      display: grid;
+      grid-template-columns: 1fr 230px;
+      gap: 14px;
+      padding: 16px 18px;
+      border-top: 1px solid #f1f5f9;
+    }
+    .task-title { font-weight: 700; line-height: 1.45; }
+    .task.done .task-title { color: #94a3b8; text-decoration: line-through; }
+    .mini-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
+    .mini { background: #f8fafc; border-radius: 14px; padding: 9px; }
+    .mini span { display: block; font-size: 10px; color: #64748b; font-weight: 800; text-transform: uppercase; }
+    .mini strong { display: block; font-size: 12px; margin-top: 4px; }
+    .task-actions { display: flex; flex-direction: column; gap: 8px; align-items: stretch; }
+    .status { display: inline-flex; justify-content: center; align-items: center; border-radius: 999px; padding: 9px 10px; font-size: 13px; font-weight: 800; }
+    .status-wait { background: #fef3c7; color: #92400e; }
+    .status-run { background: #dbeafe; color: #1d4ed8; }
+    .status-done { background: #dcfce7; color: #166534; }
+    .info-line {
+      background: #f8fafc;
+      border-radius: 14px;
+      padding: 12px;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 14px;
+      margin-bottom: 9px;
+    }
+    .info-line span { color: #64748b; }
+    .info-line strong { text-align: right; }
+    .history-item {
+      border: 1px solid #e2e8f0;
+      border-radius: 18px;
+      padding: 14px;
+      margin-bottom: 10px;
+    }
+    .progress { height: 8px; background: #e2e8f0; border-radius: 999px; overflow: hidden; margin-top: 10px; }
+    .progress div { height: 100%; background: #0f172a; }
+    .modal-bg {
+      position: fixed;
+      inset: 0;
+      background: rgba(15,23,42,.62);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 14px;
+      z-index: 99;
+    }
+    .modal {
+      background: white;
+      width: min(920px, 100%);
+      max-height: 90vh;
+      overflow: auto;
+      border-radius: 24px;
+      padding: 18px;
+    }
+    .modal-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; border-bottom: 1px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 14px; }
+    .report-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .report-box { border: 1px solid #e2e8f0; border-radius: 18px; padding: 12px; margin-bottom: 10px; }
+    .toast {
+      position: fixed;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #0f172a;
+      color: white;
+      padding: 12px 16px;
+      border-radius: 16px;
+      display: none;
+      z-index: 100;
+      font-weight: 700;
+    }
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: 1fr; }
+      .form-grid, .actions { grid-template-columns: 1fr; }
+      .task { grid-template-columns: 1fr; }
+      .mini-grid, .report-grid { grid-template-columns: 1fr; }
+      h1 { font-size: 28px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <div class="hero-top">
+        <img src="logo.png" class="logo" onerror="this.style.display='none'" />
+        <div>
+          <h1>Checklist de Limpeza</h1>
+          <div class="sub">Sistema mobile profissional com regras por data, tempo por tarefa, histórico e relatório gerencial.</div>
+        </div>
       </div>
-      <div class="actions">
-        <button class="btn" onclick="saveCurrent()">Salvar</button>
-        <button class="btn-green" onclick="finalizeChecklist()">Finalizar e gerar relatório</button>
-        <button class="btn-light" onclick="loadDate(document.getElementById('date').value)">Carregar data</button>
-        <button class="btn-red" onclick="clearCurrent()">Limpar atual</button>
+      <div class="chips">
+        <div class="chip" id="chipDate">Data</div>
+        <div class="chip" id="chipDay">Dia</div>
+        <div class="chip" id="chipStatus">Em andamento</div>
+        <div class="chip">Prévia HTML</div>
       </div>
     </div>
 
-    <div class="card">
-      <h2>Filtros e rotina ativa</h2>
-      <div class="form-grid" style="grid-template-columns: 1fr 220px;">
-        <div><label>Buscar tarefa</label><input id="search" placeholder="Buscar tarefa" oninput="render()" /></div>
-        <div><label>Status</label><select id="filter" onchange="render()"><option value="todos">Todas</option><option value="concluidas">Somente concluídas</option><option value="pendentes">Somente pendentes</option></select></div>
+    <div class="grid">
+      <main>
+        <div class="card">
+          <h2>Dados do checklist</h2>
+          <div class="form-grid">
+            <div><label>Responsável</label><input id="responsible" placeholder="Nome da colaboradora" /></div>
+            <div><label>Data</label><input id="date" type="date" /></div>
+            <div><label>Turno</label><select id="shift"><option>Integral</option><option>Manhã</option><option>Tarde</option></select></div>
+            <div><label>Assinatura digital</label><input id="signature" placeholder="Nome para validar" /></div>
+          </div>
+          <div class="actions">
+            <button class="btn" onclick="saveCurrent()">Salvar</button>
+            <button class="btn-green" onclick="finalizeChecklist()">Finalizar e gerar relatório</button>
+            <button class="btn-light" onclick="loadDate(document.getElementById('date').value)">Carregar data</button>
+            <button class="btn-red" onclick="clearCurrent()">Limpar atual</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Filtros e rotina ativa</h2>
+          <div class="form-grid" style="grid-template-columns: 1fr 220px;">
+            <div><label>Buscar tarefa</label><input id="search" placeholder="Buscar tarefa" oninput="render()" /></div>
+            <div><label>Status</label><select id="filter" onchange="render()"><option value="todos">Todas</option><option value="concluidas">Somente concluídas</option><option value="pendentes">Somente pendentes</option></select></div>
+          </div>
+          <div class="info-line" style="margin-top:12px;"><span>Rotinas liberadas</span><strong id="activeGroups">-</strong></div>
+        </div>
+
+        <div id="sections"></div>
+      </main>
+
+      <aside>
+        <div class="card">
+          <h2>Painel do dia</h2>
+          <div id="dailyPanel"></div>
+        </div>
+
+        <div class="card">
+          <h2>Resumo gerencial</h2>
+          <div id="summaryPanel"></div>
+          <div style="display:flex; gap:8px; margin-top:12px;">
+            <button class="btn" onclick="openReport()" style="flex:1">Ver relatório</button>
+            <button class="btn-light" onclick="downloadReport()">Baixar</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Observações gerais</h2>
+          <textarea id="generalNotes" placeholder="Ex.: falta de material, área em manutenção..."></textarea>
+        </div>
+
+        <div class="card">
+          <h2>Histórico salvo</h2>
+          <div id="history"></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <div class="modal-bg" id="reportModal">
+    <div class="modal">
+      <div class="modal-head">
+        <h2 style="margin:0">Relatório gerencial</h2>
+        <button class="btn-light" onclick="closeReport()">Fechar</button>
       </div>
-      <div class="info-line" style="margin-top:12px;"><span>Rotinas liberadas</span><strong id="activeGroups">-</strong></div>
+      <div id="reportContent"></div>
     </div>
+  </div>
 
-    <div id="sections"></div>
-  </main>
+  <div class="toast" id="toast"></div>
 
-  <aside>
-    <div class="card">
-      <h2>Painel do dia</h2>
-      <div id="dailyPanel"></div>
-    </div>
+<script>
+const GROUPS = [
+  { id:'daily', title:'Todo dia', color:'linear-gradient(90deg,#0284c7,#2563eb,#06b6d4)', items:[
+    'Tirar o lixo',
+    'Lavar a recepção, o hall de entrada e o banheiro de baixo',
+    'Limpar sala da Agatha, Wanderlei e Pedro (colocar água da cafeteira, abastecer cápsulas e xícaras)',
+    'Lavar banheiros',
+    'Limpar superfícies: Mesas do escritório, balcão, etc.',
+    'Passar pano no chão',
+    'Limpar a cozinha após o almoço',
+    'Final do dia: Passar pano nos banheiros de cima.',
+    'Final do dia: Passar pano novamente na recepção, lavar o banheiro da recepção.',
+    'Final do dia: Retirar os lixos e lavar a lixeira.'
+  ]},
+  { id:'wednesday', title:'Toda quarta', color:'linear-gradient(90deg,#c026d3,#7c3aed,#9333ea)', items:['Limpar armários por fora e por dentro','Limpar interruptores e maçanetas']},
+  { id:'friday', title:'Toda sexta', color:'linear-gradient(90deg,#059669,#16a34a,#84cc16)', items:['Lavar a cozinha, escadas e escritório no final do dia']},
+  { id:'first-monday', title:'Todo mês · primeira segunda do mês', color:'linear-gradient(90deg,#eab308,#f59e0b,#fb923c)', items:['Lavar o chão da oficina']},
+  { id:'last-friday', title:'Todo mês · última sexta do mês', color:'linear-gradient(90deg,#f43f5e,#ef4444,#f97316)', items:['Limpar superfícies altas','Limpar ventiladores','Lavar o chão do escritório']}
+];
+let entry;
+let history = JSON.parse(localStorage.getItem('cleaning_history_html') || '[]');
 
-    <div class="card">
-      <h2>Resumo gerencial</h2>
-      <div id="summaryPanel"></div>
-      <div style="display:flex; gap:8px; margin-top:12px;">
-        <button class="btn" onclick="openReport()" style="flex:1">Ver relatório</button>
-        <button class="btn-light" onclick="downloadReport()">Baixar</button>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2>Observações gerais</h2>
-      <textarea id="generalNotes" placeholder="Ex.: falta de material, área em manutenção..."></textarea>
-    </div>
-
-    <div class="card">
-      <h2>Histórico salvo</h2>
-      <div id="history"></div>
-    </div>
-  </aside>
-</div>
+function today(){ return new Date().toISOString().slice(0,10); }
+function dateObj(v){ return new Date(v + 'T12:00:00'); }
+function readable(v){ return dateObj(v).toLocaleDateString('pt-BR'); }
+function dayName(v){ return dateObj(v).toLocaleDateString('pt-BR',{weekday:'long'}); }
+function nowIso(){ return new Date().toISOString(); }
+function time(v){ return v ? new Date(v).toLocaleString('pt-BR') : '-'; }
+function duration(min){ if(!min) return '0 min'; const h=Math.floor(min/60), m=min%60; return h ? `${h}h ${String(m).padStart(2,'0')}min` : `${m} min`; }
+function diffMin(s,e){ return Math.max(0, Math.round((new Date(e)-new Date(s))/60000)); }
+function toast(msg){ const el=document.getElementById('toast'); el.textContent=msg; el.style.display='block'; setTimeout(()=>el.style.display='none',2200); }
+function createTasks(){ const obj={}; GROUPS.forEach(g=> obj[g.id]=g.items.map((label,i)=>({id:g.id+'-'+i,label,done:false,note:'',startedAt:'',checkedAt:'',durationMinutes:0}))); return obj; }
+function createEntry(date=today()){ return {responsible:'',date,shift:'Integral',signature:'',generalNotes:'',finalized:false,finalizedAt:'',tasks:createTasks(),updatedAt:nowIso()}; }
+function availableIds(date){
+  const d=dateObj(date), day=d.getDay();
+  if(day===1 && d.getDate()<=7) return ['daily','first-monday'];
+  if(day===5){ const n=new Date(d); n.setDate(d.getDate()+7); if(n.getMonth()!==d.getMonth()) return ['daily','last-friday']; return ['daily','friday']; }
+  if(day===3) return ['daily','wednesday'];
+  return ['daily'];
+}
+function activeTasks(){ return availableIds(entry.date).flatMap(id=>entry.tasks[id]||[]); }
+function syncFields(){ entry.responsible=document.getElementById('responsible').value; entry.shift=document.getElementById('shift').value; entry.signature=document.getElementById('signature').value; entry.generalNotes=document.getElementById('generalNotes').value; entry.updatedAt=nowIso(); }
+function fillFields(){ document.getElementById('responsible').value=entry.responsible; document.getElementById('date').value=entry.date; document.getElementById('shift').value=entry.shift; document.getElementById('signature').value=entry.signature; document.getElementById('generalNotes').value=entry.generalNotes; }
+function loadDate(date){ const saved=history.find(h=>h.date===date); const oldResp=entry?.responsible||''; const oldShift=entry?.shift||'Integral'; entry=saved ? structuredClone(saved) : createEntry(date); if(!saved){ entry.responsible=oldResp; entry.shift=oldShift; } fillFields(); render(); toast(saved?'Checklist salvo carregado.':'Nova data aberta com tarefas zeradas.'); }
+function saveCurrent(){ syncFields(); const idx=history.findIndex(h=>h.date===entry.date); if(idx>=0) history[idx]=structuredClone(entry); else history.unshift(structuredClone(entry)); history.sort((a,b)=>b.date.localeCompare(a.date)); localStorage.setItem('cleaning_history_html',JSON.stringify(history)); render(); toast('Checklist salvo.'); }
+function finalizeChecklist(){ syncFields(); entry.finalized=true; entry.finalizedAt=nowIso(); saveCurrent(); openReport(); }
+function clearCurrent(){ if(!confirm('Limpar checklist atual?')) return; const d=entry.date, r=entry.responsible, s=entry.shift; entry=createEntry(d); entry.responsible=r; entry.shift=s; fillFields(); render(); toast('Checklist limpo.'); }
+function startTask(gid,tid){ const t=entry.tasks[gid].find(x=>x.id===tid); if(!t||t.done||t.startedAt)return; t.startedAt=nowIso(); entry.updatedAt=nowIso(); render(); }
+function finishTask(gid,tid){ const t=entry.tasks[gid].find(x=>x.id===tid); if(!t)return; const end=nowIso(); t.startedAt=t.startedAt||end; t.checkedAt=end; t.durationMinutes=diffMin(t.startedAt,end); t.done=true; entry.updatedAt=nowIso(); render(); }
+function reopenTask(gid,tid){ const t=entry.tasks[gid].find(x=>x.id===tid); if(!t)return; t.done=false; t.startedAt=''; t.checkedAt=''; t.durationMinutes=0; entry.updatedAt=nowIso(); render(); }
+function setNote(gid,tid,val){ const t=entry.tasks[gid].find(x=>x.id===tid); if(t)t.note=val; }
+function render(){
+  fillFields();
+  const ids=availableIds(entry.date), tasks=activeTasks(), done=tasks.filter(t=>t.done).length, pend=tasks.length-done, total=tasks.reduce((a,t)=>a+t.durationMinutes,0);
+  document.getElementById('chipDate').textContent=readable(entry.date);
+  document.getElementById('chipDay').textContent=dayName(entry.date);
+  document.getElementById('chipStatus').textContent=entry.finalized?'Finalizado':'Em andamento';
+  document.getElementById('activeGroups').textContent=GROUPS.filter(g=>ids.includes(g.id)).map(g=>g.title).join(' + ');
+  document.getElementById('dailyPanel').innerHTML=`<div class="info-line"><span>Data</span><strong>${readable(entry.date)}</strong></div><div class="info-line"><span>Dia</span><strong>${dayName(entry.date)}</strong></div><div class="info-line"><span>Responsável</span><strong>${entry.responsible||'Não preenchido'}</strong></div><div class="info-line"><span>Status</span><strong>${entry.finalized?'Finalizado':'Em andamento'}</strong></div>`;
+  document.getElementById('summaryPanel').innerHTML=`<div class="info-line"><span>Feitas</span><strong>${done}</strong></div><div class="info-line"><span>Faltaram</span><strong>${pend}</strong></div><div class="info-line"><span>Tempo total</span><strong>${duration(total)}</strong></div>`;
+  const search=document.getElementById('search').value.toLowerCase(), filter=document.getElementById('filter').value;
+  document.getElementById('sections').innerHTML=GROUPS.filter(g=>ids.includes(g.id)).map(g=>{
+    const filtered=(entry.tasks[g.id]||[]).filter(t=>(!search||t.label.toLowerCase().includes(search))&&(filter==='todos'||(filter==='concluidas'&&t.done)||(filter==='pendentes'&&!t.done)));
+    return `<section class="section"><div class="section-head" style="background:${g.color}"><h3>${g.title}</h3><div class="section-count">${(entry.tasks[g.id]||[]).filter(t=>t.done).length}/${(entry.tasks[g.id]||[]).length} concluídas</div></div>${filtered.map(t=>{
+      const run=t.startedAt&&!t.done;
+      return `<div class="task ${t.done?'done':''}"><div><div class="task-title">${t.label}</div><div class="mini-grid"><div class="mini"><span>Início</span><strong>${time(t.startedAt)}</strong></div><div class="mini"><span>Conclusão</span><strong>${time(t.checkedAt)}</strong></div><div class="mini"><span>Duração</span><strong>${duration(t.durationMinutes)}</strong></div></div><input style="margin-top:10px" value="${(t.note||'').replaceAll('"','&quot;')}" oninput="setNote('${g.id}','${t.id}',this.value)" placeholder="Observação da tarefa"></div><div class="task-actions">${!t.startedAt&&!t.done?`<button class="btn-blue" onclick="startTask('${g.id}','${t.id}')">Iniciar tarefa</button>`:''}${run?`<button class="btn-green" onclick="finishTask('${g.id}','${t.id}')">Concluir tarefa</button>`:''}${t.done?`<button class="btn-light" onclick="reopenTask('${g.id}','${t.id}')">Reabrir tarefa</button>`:''}<div class="status ${t.done?'status-done':run?'status-run':'status-wait'}">${t.done?'Concluída em '+duration(t.durationMinutes):run?'Em andamento':'Não iniciada'}</div></div></div>`}).join('')}</section>`;
+  }).join('');
+  document.getElementById('history').innerHTML=history.length?history.map(h=>{ const ids=availableIds(h.date), ts=ids.flatMap(id=>h.tasks[id]||[]), d=ts.filter(t=>t.done).length, p=ts.length?Math.round(d/ts.length*100):0; return `<div class="history-item"><b>${readable(h.date)}</b><br><small>${h.responsible||'Sem responsável'} · ${h.shift}</small><div class="progress"><div style="width:${p}%"></div></div><div style="display:flex;gap:8px;margin-top:10px"><button class="btn" onclick="loadDate('${h.date}')" style="flex:1">Abrir</button><button class="btn-red" onclick="deleteHistory('${h.date}')">Excluir</button></div></div>` }).join(''):'<div class="history-item">Nenhum registro salvo ainda.</div>';
+}
+function deleteHistory(date){ if(!confirm('Excluir este registro?'))return; history=history.filter(h=>h.date!==date); localStorage.setItem('cleaning_history_html',JSON.stringify(history)); render(); }
+function reportData(){ const ids=availableIds(entry.date), all=ids.flatMap(id=>(entry.tasks[id]||[]).map(t=>({...t, group:GROUPS.find(g=>g.id===id).title}))); return {done:all.filter(t=>t.done), pend:all.filter(t=>!t.done), total:all.reduce((a,t)=>a+t.durationMinutes,0)}; }
+function openReport(){ syncFields(); const r=reportData(); document.getElementById('reportContent').innerHTML=`<div class="report-grid"><div><h3>Tarefas concluídas</h3>${r.done.length?r.done.map(t=>`<div class="report-box"><small><b>${t.group}</b></small><br><b>${t.label}</b><br>Início: ${time(t.startedAt)}<br>Conclusão: ${time(t.checkedAt)}<br>Duração: ${duration(t.durationMinutes)}${t.note?'<br>Obs.: '+t.note:''}</div>`).join(''):'<div class="report-box">Nenhuma tarefa concluída.</div>'}</div><div><h3>Tarefas pendentes</h3>${r.pend.length?r.pend.map(t=>`<div class="report-box"><small><b>${t.group}</b></small><br><b>${t.label}</b>${t.note?'<br>Obs.: '+t.note:''}</div>`).join(''):'<div class="report-box">Nenhuma pendência.</div>'}</div></div><div style="margin-top:12px" class="info-line"><span>Tempo total</span><strong>${duration(r.total)}</strong></div>`; document.getElementById('reportModal').style.display='flex'; }
+function closeReport(){ document.getElementById('reportModal').style.display='none'; }
+function downloadReport(){ const r=reportData(); const text=`RELATÓRIO GERENCIAL - CHECKLIST DE LIMPEZA\nData: ${readable(entry.date)}\nResponsável: ${entry.responsible||'Não informado'}\nTempo total: ${duration(r.total)}\n\nTAREFAS CONCLUÍDAS:\n${r.done.map((t,i)=>`${i+1}. [${t.group}] ${t.label} | Início: ${time(t.startedAt)} | Conclusão: ${time(t.checkedAt)} | Duração: ${duration(t.durationMinutes)}`).join('\n')||'Nenhuma'}\n\nTAREFAS PENDENTES:\n${r.pend.map((t,i)=>`${i+1}. [${t.group}] ${t.label}`).join('\n')||'Nenhuma'}`; const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([text],{type:'text/plain'})); a.download='relatorio-checklist-'+entry.date+'.txt'; a.click(); }
+document.getElementById('date').addEventListener('change',e=>loadDate(e.target.value));
+entry=createEntry(today());
+fillFields();
+render();
+</script>
+</body>
+</html>
